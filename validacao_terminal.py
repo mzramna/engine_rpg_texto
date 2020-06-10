@@ -6,6 +6,7 @@ class validacao:
         elif resposta == "n":
             return False
         else:
+            self.limpar()
             print("opção inválida")
             return self.S_N(texto)
 
@@ -18,6 +19,7 @@ class validacao:
         elif resposta == "n":
             return False
         else:
+            self.limpar()
             print("opção inválida")
             return self.correto(texto)
 
@@ -46,6 +48,7 @@ class validacao:
                         else:
                             return self.resposta_valida(respostas, pergunta, pergunta2, predefinido, confirmar,initial)
                     else:
+                        self.limpar()
                         print("a opção selecionada não existe")
                         return self.resposta_valida(respostas, pergunta, pergunta2, predefinido, confirmar,initial)
                 else:
@@ -54,6 +57,7 @@ class validacao:
                         if self.S_N("a resposta selecionada está correta?"):
                             return int(resposta)
                         else:
+                            self.limpar()
                             return self.resposta_valida(respostas, pergunta, pergunta2, predefinido, confirmar,initial)
                     else:
                         return int(resposta)
@@ -68,12 +72,14 @@ class validacao:
         try:
             resposta = tipo(resposta)
         except:
+            self.limpar()
             print("resposta inválida")
             return self.confirmacao(pergunta, tipo)
         print("a resposta selecionada foi: " + str(resposta))
         if self.S_N("a resposta dada está correta?"):
             return resposta
         else:
+            self.limpar()
             return self.confirmacao(pergunta, tipo)
 
     def limpar(self):

@@ -10,7 +10,7 @@ import myJSON
             ex: a primeira condição foi ativada,sendo assim verifica a segunda,e assim por diante até que alguma não seja ativada,
             a anterior a essa não ativada será a selecionada 
     item:{"identificador":0,"nome do item":"","descricao do item":"","usavel em":[0,0],"durabilidade":1,"crafting":[0,0]}
-    acao:{"identificador":0,"descrição da ação":"","itens necessários":[],"dicas":[0,0],"resultado":0}
+    acao:{"identificador":0,"descrição da ação":"","itens necessários":[],"dicas":[0,0],"resultado":0,"acoes necessárias":[0,0]}
     resultados:{"identificador":0,"texto explicativo":"","itens ganhos":[0,0],"itens perdidos":[0,0],"local destino":0/NULL}
     dica:{"identificados":0,"item necessário":[0,0],"local necessário":[0,0],"texto da dica":""}
 '''
@@ -29,12 +29,14 @@ class engine_rpg_texto:
         self.mochila=[]
         self.acoes_realizadas=[]
         self.opcoes_base=["inventario","criacao","menu","mapa"]
+        
     def start(self):
         self.entrar_comodo(self.posicao_jogador)
 
     def entrar_comodo(self,comodo:int):
         _comodo=self.json.search(self.comodos,"identificador",comodo)
         opcao=self.validacao.resposta_valida(self.opcoes_base+_comodo["acoes"],pergunta=_comodo["texto de entrada"],confirmar=True)
+        self.validacao.limpar()
         if opcao == 0:#inventario
             self.mostrar_inventario()
         elif opcao == 1:#criacao
@@ -53,22 +55,48 @@ class engine_rpg_texto:
                 self.entrar_comodo(comodo)
 
     def realizar_acao(self,acao:int):
+        self.validacao.limpar()
         _acao=self.json.search(self.acoes,"identificador",acao)
         opcao = self.validacao.resposta_valida(self.opcoes_base + _acao["acoes"],
                                                pergunta=_acao["texto de entrada"], confirmar=True)
         self.acoes_realizadas.append(opcao)
+        self.ativar_resultado(_acao["resultado"])
+
+    def ativar_resultado(self,resultado):
+        self.validacao.limpar()
+        _resultado=self.json.search(self.resultados,"identificador",resultado)
+        print(_resultado["texto explicativo"])
+        input()
+        self.validacao.limpar()
+        for item in _resultado["itens ganhos"]:
+            self.mochila.append(item)
+        for item in _resultado["itens perdidos"]:
+            self.mochila.remove(item)
+        try:
+            if _resultado["local destino"]!=("" or None ) and type(_resultado["local destino"]) == int:
+                self.posicao_jogador=_resultado["local destino"]
+            if type(_resultado["local destino"]) != int:
+                raise Exception
+        except:
+            print("corrupted file")
+        
 
     def pre_requisito_acao(self,acao:int):
         _acao = self.json.search(self.acoes, "identificador", acao)
         for item in _acao["itens necessarios"]:
             if item not in self.mochila:
                 return False
+        for acao in _acao["acoes necessarias"]:
+            if acao not in self.acoes_realizadas:
+                return False
         return True
 
     def mostrar_dica(self,acao:int):
         _acao = self.json.search(self.acoes, "identificador", acao)
         print(_acao["dicas"][math.random(0,len(_acao["dicas"]))])
-
+        input()
+        self.validacao.limpar()
+        
     def mostrar_menu(self):
         pass
     def mostrar_inventario(self):
