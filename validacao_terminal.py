@@ -9,6 +9,22 @@ class validacao:
             self.limpar()
             print("opção inválida")
             return self.S_N(texto)
+        
+    def numero(self,texto,inteiro=False):
+        resposta = input(str(texto))
+        if type(resposta) == type(0) and inteiro == True:
+            return resposta
+        elif type(resposta) == type(0.0) and inteiro == False:
+            return resposta
+        else:
+            self.limpar()
+            print("o valor inserido é inválido")
+            texto="o valor inserido deve ser um"
+            if inteiro==True:
+                texto+=" numero sem virgula"
+            else:
+                texto+=" numero com virgula"
+            return self.numero(texto,inteiro)
 
     def correto(self, texto):
         print("o valor:")
